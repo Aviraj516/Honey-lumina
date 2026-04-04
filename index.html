@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Honey Lumina | Timeless Resin Flower Jewellery</title>
+    <link rel="preload" href="/mainpagefront.jpeg" as="image" fetchpriority="high" />
+  </head>
+  <body>
+    <div class="snow-container"></div>
+    <canvas id="sparkle-canvas"></canvas>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const container = document.querySelector(".snow-container");
+        const flowerCount = 30;
+        
+        for (let i = 0; i < flowerCount; i++) {
+          const flower = document.createElement("div");
+          flower.classList.add("flower");
+          flower.innerHTML = "🌼";
+          
+          // Random size between 8px and 12px
+          const size = Math.random() * 4 + 8;
+          flower.style.fontSize = size + "px";
+          
+          // Random horizontal position
+          flower.style.left = Math.random() * 100 + "vw";
+          
+          // Random falling speed
+          flower.style.animationDuration = Math.random() * 8 + 10 + "s";
+          
+          // Random initial rotation
+          flower.style.transform = `rotate(${Math.random() * 360}deg)`;
+          
+          container.appendChild(flower);
+        }
+      });
+    </script>
+    <script>
+      const canvas = document.getElementById('sparkle-canvas');
+      const ctx = canvas.getContext('2d');
+
+      let W = canvas.width = window.innerWidth;
+      let H = canvas.height = window.innerHeight;
+
+      const isMobile = W < 768;
+      const PARTICLE_COUNT = isMobile ? 25 : W < 1024 ? 40 : 60;
+
+      const particles = [];
+
+      function randomBetween(a, b) {
+        return a + Math.random() * (b - a);
+      }
+
+      function createParticle() {
+        return {
+          x: randomBetween(0, W),
+          y: randomBetween(0, H),
+          r: randomBetween(0.4, 1.6),
+          speed: randomBetween(0.15, 0.45),
+          opacity: randomBetween(0.08, 0.28),
+          swing: randomBetween(0.1, 0.4),
+          angle: randomBetween(0, Math.PI * 2),
+          angleSpeed: randomBetween(0.005, 0.015)
+        };
+      }
+
+      for (let i = 0; i < PARTICLE_COUNT; i++) {
+        particles.push(createParticle());
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, W, H);
+
+        particles.forEach(p => {
+          p.y += p.speed;
+          p.angle += p.angleSpeed;
+          p.x += Math.sin(p.angle) * p.swing;
+
+          if (p.y > H + 10) {
+            p.y = -10;
+            p.x = randomBetween(0, W);
+            p.opacity = randomBetween(0.08, 0.28);
+          }
+          
+          if (p.x < -20) p.x = W + 20;
+          if (p.x > W + 20) p.x = -20;
+
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(198, 167, 90, ${p.opacity})`;
+          ctx.shadowBlur = 5;
+          ctx.shadowColor = `rgba(198, 167, 90, 0.4)`;
+          ctx.fill();
+          ctx.closePath();
+        });
+
+        requestAnimationFrame(draw);
+      }
+
+      draw();
+
+      window.addEventListener('resize', () => {
+        W = canvas.width = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+      });
+    </script>
+  </body>
+</html>
+
